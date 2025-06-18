@@ -72,7 +72,7 @@ class TicTacToe:
                     case _: raise ValueError(f"Os estados válidos do tabuleiro são 0, 1 e -1. Foi encontrado '{self.board[r][c]}' na posição [{r}][{c}].")
 
     def make_move(self, r, c):
-        self.board, outcome = eval_move(self.board, (r, c))
+        outcome = eval_move(self.board, (r, c))
         self.redraw()
         match outcome:
             case Outcome.X_WINS: self.popup_message("Jogador 'x' ganhou!")

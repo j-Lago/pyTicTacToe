@@ -3,23 +3,27 @@ from outcome_convention import Outcome
 BoardSateType = list[list[int]]
 
 
-def eval_move(board: BoardSateType, next_move: tuple[int, int]) -> tuple[BoardSateType, Outcome]:
+def eval_move(board: BoardSateType, next_move: tuple[int, int]) -> Outcome:
 
     if not validate(board):
-        return board, Outcome.INVALID_STATE
+        return Outcome.INVALID_STATE
 
     r, c = next_move
     if board[r][c] == 0:
         board[r][c] = 1 if board_sum(board) == 0 else -1
     else:
-        return board, Outcome.INVALID_MOVE
+        return Outcome.INVALID_MOVE
 
-    if (outcome := h_check(board)) != Outcome.CONTINUE: return board, outcome
-    if (outcome := v_check(board)) != Outcome.CONTINUE: return board, outcome
-    if (outcome := d_check(board)) != Outcome.CONTINUE: return board, outcome
-    if full_check(board): return board, Outcome.DRAW
+    if (outcome := h_check(board)) != Outcome.CONTINUE:
+        return outcome
+    if (outcome := v_check(board)) != Outcome.CONTINUE:
+        return outcome
+    if (outcome := d_check(board)) != Outcome.CONTINUE:
+        return outcome
+    if full_check(board):
+        return Outcome.DRAW
 
-    return board, Outcome.CONTINUE
+    return Outcome.CONTINUE
 
 
 def board_sum(board):
