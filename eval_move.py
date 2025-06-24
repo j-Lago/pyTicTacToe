@@ -1,12 +1,22 @@
-def eval_move(board: list[list[int]], r, c) -> tuple[list[list[int]], int]:
+from outcome_convention import Outcome
+
+def eval_move(board: list[list[int]], r, c) -> Outcome:
     bsum = board_sum(board)
     if board[r][c] == 0:
         board[r][c] = 1 if bsum == 0 else -1
-    result = h_check(board) + v_check(board) + d_check(board)
+    else:
+        return Outcome.INVALID_MOVE
 
-    if result == 0 and full_check(board):
-        result = 2
-    return result
+    if (outcome := h_check(board)) != Outcome.CONTINUE:
+        return outcome
+    if (outcome := v_check(board)) != Outcome.CONTINUE:
+        return outcome
+    if (outcome := d_check(board)) != Outcome.CONTINUE:
+        return outcome
+
+    if full_check(board):
+        return Outcome.DRAW
+    return Outcome.CONTINUE
 
 
 def board_sum(board):
@@ -26,9 +36,9 @@ def h_check(board) -> int:
         for c in range(3):
             cum += board[r][c]
         if cum == 3:
-            return 1
+            return Outcome.X_WINS
         if cum == -3:
-            return -1
+            return Outcome.O_WINS
     return 0
 
 
@@ -38,10 +48,10 @@ def v_check(board) -> int:
         for r in range(3):
             cum += board[r][c]
         if cum == 3:
-            return 1
+            return Outcome.X_WINS
         if cum == -3:
-            return -1
-    return 0
+            return Outcome.O_WINS
+    return Outcome.CONTINUE
 
 
 def full_check(board) -> bool:
@@ -56,7 +66,7 @@ def d_check(board) -> int:
     cum1 = board[0][0] + board[1][1] + board[2][2]
     cum2 = board[2][0] + board[1][1] + board[0][2]
     if cum1 == 3 or cum2 == 3:
-        return 1
+        return Outcome.X_WINS
     if cum1 == -3 or cum2 == -3:
-        return -1
-    return 0
+        return Outcome.O_WINS
+    return Outcome.CONTINUE

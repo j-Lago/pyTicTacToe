@@ -1,6 +1,8 @@
 from pathlib import Path
 import tkinter as tk
 from eval_move import eval_move
+from outcome_convention import Outcome
+
 
 class TicTacToe:
     def __init__(self):
@@ -12,6 +14,7 @@ class TicTacToe:
 
         self.board = None
         self.buttons = None
+        self.popup = None
         self.reset()
 
         self.window.title('Tic-Tac-Toe')
@@ -21,6 +24,9 @@ class TicTacToe:
     def reset(self):
         self.board = [[0 for _ in range(3)] for _ in range(3)]
         self.create_board()
+        if self.popup is not None:
+            self.popup.destroy()
+            self.popup = None
 
     def popup_message(self, message, bg=None):
         self.window.update_idletasks()
@@ -29,9 +35,9 @@ class TicTacToe:
         x = (self.window.winfo_x()) + (self.window.winfo_width() // 2) - (w // 2) + 6
         y = (self.window.winfo_y()) + (self.window.winfo_height() // 2) - (h // 2) + 6
 
-        popup = tk.Toplevel()
-        popup.overrideredirect(True)
-        popup.geometry(f"{w}x{h}+{x}+{y}")
+        self.popup = tk.Toplevel()
+        self.popup.overrideredirect(True)
+        self.popup.geometry(f"{w}x{h}+{x}+{y}")
         if bg is None:
             bg2 = '#7F7F7F'
         else:
@@ -39,11 +45,13 @@ class TicTacToe:
         bg3 = '#777777'
         fg = '#F1F1F1'
         font = 'Comic Sans MS'
-        popup.config(bg=bg2)
-        label = tk.Label(popup, text=message, font=(font, 22), bg=bg2, foreground=fg)
+        self.popup.config(bg=bg2)
+        label = tk.Label(self.popup, text=message, font=(font, 22), bg=bg2, foreground=fg)
         label.pack(pady=10)
-        tk.Button(popup, text="jogar novamente", font=(font, 16), command=popup.destroy, bg=bg3, activebackground=bg3, foreground=fg, relief='flat').pack()
-        popup.grab_set()
+        tk.Button(self.popup, text="jogar novamente", font=(font, 16), command=self.reset, bg=bg3, activebackground=bg3, foreground=fg, relief='flat').pack()
+        self.popup.grab_set()
+
+
 
     def create_board(self):
         self.buttons = [[None for _ in range(3)] for _ in range(3)]
@@ -70,21 +78,33 @@ class TicTacToe:
 
 
     def make_move(self, r, c):
-        result = eval_move(self.board, r, c)
+        result = enum_eval_move(self.board, r, c)
         self.redraw()
         match result:
-            case 1:
+            case Outcome.X_WINS:
                 self.popup_message("Jogador 𝒪 ganhou!")
-                self.reset()
-            case -1:
+            case Outcome.O_WINS:
                 self.popup_message("Jogador ✘ ganhou!")
-                self.reset()
-            case 2:
+            case Outcome.DRAW:
                 self.popup_message("Empate!")
-                self.reset()
-            case _: pass
+            case Outcome.INVALID_MOVE:
+                self.window.bell()
+            case Outcome.INVALID_STATE:
+                self.window.destroy()
+                raise ValueError("Estado inválido do tabuleiro")
+            case Outcome.CONTINUE: pass
 
-
+def enum_eval_move(board, r, c):
+    result = eval_move(board, r, c)
+    if isinstance(result, int):
+        match result:
+            case -4: return Outcome.INVALID_MOVE
+            case -2: return Outcome.INVALID_STATE
+            case 0: return Outcome.CONTINUE
+            case 1: return Outcome.X_WINS
+            case 2: return Outcome.O_WINS
+            case 3: return Outcome.DRAW
+    return result
 
 if __name__ == '__main__':
     TicTacToe()
