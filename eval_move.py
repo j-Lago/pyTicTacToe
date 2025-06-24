@@ -6,7 +6,7 @@ def eval_move(board: list[list[int]], r, c) -> tuple[list[list[int]], int]:
 
     if result == 0 and full_check(board):
         result = 2
-    return board, result
+    return result
 
 
 def board_sum(board):

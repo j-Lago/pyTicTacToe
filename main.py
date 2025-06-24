@@ -22,8 +22,8 @@ class TicTacToe:
         self.board = [[0 for _ in range(3)] for _ in range(3)]
         self.create_board()
 
-    def popup_message(self, message):
-        self.window.update_idletasks()  # Garante que as dimensões estejam atualizadas
+    def popup_message(self, message, bg=None):
+        self.window.update_idletasks()
 
         w, h = 320, 120
         x = (self.window.winfo_x()) + (self.window.winfo_width() // 2) - (w // 2) + 6
@@ -32,14 +32,17 @@ class TicTacToe:
         popup = tk.Toplevel()
         popup.overrideredirect(True)
         popup.geometry(f"{w}x{h}+{x}+{y}")
-        bg2 = '#7F7F7F'
+        if bg is None:
+            bg2 = '#7F7F7F'
+        else:
+            bg2 = bg
         bg3 = '#777777'
         fg = '#F1F1F1'
         font = 'Comic Sans MS'
         popup.config(bg=bg2)
         label = tk.Label(popup, text=message, font=(font, 22), bg=bg2, foreground=fg)
         label.pack(pady=10)
-        tk.Button(popup, text="RESET", font=(font, 16), command=popup.destroy, bg=bg3, activebackground=bg3, foreground=fg, relief='flat').pack()
+        tk.Button(popup, text="jogar novamente", font=(font, 16), command=popup.destroy, bg=bg3, activebackground=bg3, foreground=fg, relief='flat').pack()
         popup.grab_set()
 
     def create_board(self):
@@ -67,14 +70,14 @@ class TicTacToe:
 
 
     def make_move(self, r, c):
-        self.board, result = eval_move(self.board, r, c)
+        result = eval_move(self.board, r, c)
         self.redraw()
         match result:
             case 1:
-                self.popup_message("Jogador 'o' ganhou!")
+                self.popup_message("Jogador 𝒪 ganhou!")
                 self.reset()
             case -1:
-                self.popup_message("Jogador 'x' ganhou!")
+                self.popup_message("Jogador ✘ ganhou!")
                 self.reset()
             case 2:
                 self.popup_message("Empate!")
