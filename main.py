@@ -96,6 +96,7 @@ class TicTacToe:
 
 def enum_eval_move(board, r, c):
     result = eval_move(board, r, c)
+    print(result)
     if isinstance(result, int):
         match result:
             case -4: return Outcome.INVALID_MOVE

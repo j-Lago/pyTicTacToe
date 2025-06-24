@@ -39,7 +39,7 @@ def h_check(board) -> int:
             return Outcome.X_WINS
         if cum == -3:
             return Outcome.O_WINS
-    return 0
+    return Outcome.CONTINUE
 
 
 def v_check(board) -> int:
